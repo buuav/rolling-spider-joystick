@@ -1,0 +1,29 @@
+{
+  "name": "ardrone-joystick",
+  "version": "0.0.1",
+  "description": "Control a Parrot AR Drone through joystick inputs",
+  "main": "index.js",
+  "dependencies": {
+    "ar-drone": "^0.3.3",
+    "node-hid": "^0.4.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/buuav/ardrone-joystick.git"
+  },
+  "keywords": [
+    "node",
+    "ardrone",
+    "joystick",
+    "node-hid"
+  ],
+  "author": "ghirlekar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/buuav/ardrone-joystick/issues"
+  },
+  "homepage": "https://github.com/buuav/ardrone-joystick#readme"
+}
