@@ -1,4 +1,6 @@
-var quad = require('ar-drone').createClient();
+var quad = new require('rolling-spider')({
+    logger: console.log
+});
 var hid = require('node-hid');
 // console.log(hid.devices());
 // Logitech Extreme 3D Pro's vendorID and productID: 1133:49685 (i.e. 046d:c215)
@@ -8,34 +10,57 @@ var joystick = new hid.HID(1133, 49685);
 var flying = false;
 var prevButtons;
 
-quad.on('navdata', console.log);
+quad.connect(function(err) {
+    if (err) console.log(err);
+    quad.setup(function(err) {
+        if (err) console.log(err);
+        quad.flatTrim();
+        quad.startPing();
+        quad.flatTrim();
 
-joystick.on('data', function(buf) {
-    var controls = parseControls(buf);
-    if (!prevButtons)
-        prevButtons = controls.buttons;
-    if (prevButtons[0] === 0 && controls.buttons[0] === 1) {
-        if (flying) {
+        joystick.on('data', function(buf) {
+            var controls = parseControls(buf);
+            if (!prevButtons)
+                prevButtons = controls.buttons;
+            if (prevButtons[0] === 0 && controls.buttons[0] === 1) {
+                if (flying) {
+                    quad.land();
+                    flying = false;
+                } else {
+                    quad.flatTrim();
+                    quad.takeoff();
+                    flying = true;
+                }
+            }
+            prevButtons = controls.buttons;
+            if (controls.buttons[1]) {
+                if (controls.pitch <= 512) quad.forward(controlObject(controls.pitch, 512));
+                else quad.backward(-controlObject(controls.pitch, 512));
+
+                if (controls.roll <= 512) quad.left(controlObject(controls.roll, 512));
+                else quad.right(-controlObject(controls.roll, 512));
+
+                if (controls.yaw <= 128)    quad.counterClockwise(controlObject(controls.yaw, 128));
+                else quad.clockwise(-controlObject(controls.yaw, 128));
+                
+                if(controls.throttle <= 128)  quad.down(controlObject(controls.throttle, 128));
+                else quad.up(-controlObject(controls.throttle, 128));
+            }
+            // console.log(JSON.stringify(controls));
+        });
+        joystick.on('error', function() {
             quad.land();
-            flying = false;
-        } else {
-            quad.takeoff();
-            flying = true;
-        }
-    }
-    prevButtons = controls.buttons;
-    if (controls.buttons[1]) {
-        quad.front((512 - controls.pitch) / 512);
-        quad.left((512 - controls.roll) / 512);
-        quad.counterClockwise((128 - controls.yaw) / 128);
-        quad.up((controls.throttle - 128) / 128);
-    }
-    // console.log(JSON.stringify(controls));
-});
-joystick.on('error', function() {
-    quad.land();
+        });
+    });
 });
 
+
+function controlObject(val, range) {
+    return {
+        speed: 100 / range * (range - val),
+        time: 1
+    }
+}
 
 function parseControls(buf) {
     var ch = buf.toString('hex').match(/.{1,2}/g).map(function(c) {
