@@ -1,4 +1,5 @@
-var quad = new require('rolling-spider')({
+var RollingSpider = new require('rolling-spider');
+var quad = new RollingSpider({
     logger: console.log
 });
 var hid = require('node-hid');
@@ -33,18 +34,16 @@ quad.connect(function(err) {
                 }
             }
             prevButtons = controls.buttons;
-            if (controls.buttons[1]) {
-                if (controls.pitch <= 512) quad.forward(controlObject(controls.pitch, 512));
-                else quad.backward(-controlObject(controls.pitch, 512));
-
-                if (controls.roll <= 512) quad.left(controlObject(controls.roll, 512));
-                else quad.right(-controlObject(controls.roll, 512));
-
-                if (controls.yaw <= 128)    quad.counterClockwise(controlObject(controls.yaw, 128));
-                else quad.clockwise(-controlObject(controls.yaw, 128));
-                
-                if(controls.throttle <= 128)  quad.down(controlObject(controls.throttle, 128));
-                else quad.up(-controlObject(controls.throttle, 128));
+            if (flying) {
+                if (controls.buttons[1]) {
+                    quad.driveStepsRemaining = 1;
+                    quad.speeds = {
+                        yaw: 100 * (controls.yaw - 128) / 128,
+                        pitch: -100 * (controls.pitch - 512) / 512,
+                        roll: 100 * (controls.roll - 512) / 512,
+                        altitude: 100 * (controls.throttle - 128) / 128
+                    }
+                } else quad.hover();
             }
             // console.log(JSON.stringify(controls));
         });
@@ -54,13 +53,6 @@ quad.connect(function(err) {
     });
 });
 
-
-function controlObject(val, range) {
-    return {
-        speed: 100 / range * (range - val),
-        time: 1
-    }
-}
 
 function parseControls(buf) {
     var ch = buf.toString('hex').match(/.{1,2}/g).map(function(c) {
