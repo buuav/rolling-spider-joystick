@@ -9,7 +9,8 @@ var joystick = new hid.HID(1133, 49685);
 // console.log(joystick);
 
 var flying = false;
-var prevButtons;
+var inFlip = false;
+var prevControls;
 
 quad.connect(function(err) {
     if (err) console.log(err);
@@ -21,9 +22,9 @@ quad.connect(function(err) {
 
         joystick.on('data', function(buf) {
             var controls = parseControls(buf);
-            if (!prevButtons)
-                prevButtons = controls.buttons;
-            if (prevButtons[0] === 0 && controls.buttons[0] === 1) {
+            if (!prevControls)
+                prevControls = controls;
+            if (prevControls.buttons[0] === 0 && controls.buttons[0] === 1) {
                 if (flying) {
                     quad.land();
                     flying = false;
@@ -33,8 +34,27 @@ quad.connect(function(err) {
                     flying = true;
                 }
             }
-            prevButtons = controls.buttons;
-            if (flying) {
+            if (prevControls.view === 8 && controls.view !== 8)
+                switch (controls.view) {
+                    case 0:
+                        inFlip = true;
+                        quad.frontFlip(flipDone);
+                        break;
+                    case 2:
+                        inFlip = true;
+                        quad.rightFlip(flipDone);
+                        break;
+                    case 4:
+                        inFlip = true;
+                        quad.backFlip(flipDone);
+                        break;
+                    case 6:
+                        inFlip = true;
+                        quad.leftFlip(flipDone);
+                        break;
+                }
+            prevControls = controls;
+            if (flying && !inFlip) {
                 if (controls.buttons[1]) {
                     quad.driveStepsRemaining = 1;
                     quad.speeds = {
@@ -52,6 +72,10 @@ quad.connect(function(err) {
         });
     });
 });
+
+function flipDone() {
+    inFlip = false;
+}
 
 
 function parseControls(buf) {
