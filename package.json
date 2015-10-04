@@ -5,7 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "node-hid": "^0.4.0",
-    "rolling-spider": "^1.5.0"
+    "rolling-spider": "^1.5.0",
+    "temporal": "^0.4.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
