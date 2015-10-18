@@ -1,30 +1,31 @@
 {
-  "name": "rolling-spider-joystick",
-  "version": "0.0.1",
-  "description": "Control a Parrot Rolling Spider through joystick inputs",
-  "main": "index.js",
-  "dependencies": {
-    "node-hid": "^0.4.0",
-    "rolling-spider": "^1.5.0"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/buuav/rolling-spider-joystick.git"
-  },
-  "keywords": [
-    "node",
-    "parrot",
-    "rolling-spider",
-    "joystick",
-    "node-hid"
-  ],
-  "author": "ghirlekar",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/buuav/rolling-spider-joystick/issues"
-  },
-  "homepage": "https://github.com/buuav/rolling-spider-joystick#readme"
+    "name": "rolling-spider-joystick",
+    "version": "0.0.1",
+    "description": "Control a Parrot Rolling Spider through joystick inputs",
+    "main": "index.js",
+    "dependencies": {
+        "node-hid": "^0.4.0",
+        "rolling-spider": "^1.5.0",
+        "serialport": "^1.7.4"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/buuav/rolling-spider-joystick.git"
+    },
+    "keywords": [
+        "node",
+        "parrot",
+        "rolling-spider",
+        "joystick",
+        "node-hid"
+    ],
+    "author": "ghirlekar",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/buuav/rolling-spider-joystick/issues"
+    },
+    "homepage": "https://github.com/buuav/rolling-spider-joystick#readme"
 }

@@ -14,9 +14,9 @@ var inFlip = false;
 var prevControls;
 
 
-var Serial = serialport.SerialPort(process.argv[2], {
+var Serial = new serialport.SerialPort(process.argv[2], {
     baudrate: 115200,
-    parser: serialport.parsers.readline('\n');
+    parser: serialport.parsers.readline('\r\n')
 }, true, onSerialConnected);
 
 function onSerialConnected(err) {
@@ -103,16 +103,24 @@ function onJoystickData(data) {
 }
 
 function onSerialData(data) {
-    var eulerAngles = data.split(',').slice(1);
-    if (flying && !inFlip) {
-        quad.driveStepsRemaining = 1;
-        quad.speeds = {
-            yaw: 0,
-            pitch: -eulerAngles[0],
-            roll: eulerAngles[1],
-            altitude: 0
+    var eulerAngles = data.split(',').slice(1).map(function(item) {
+        return parseInt(item);
+    });
+    var imuPitch = eulerAngles[0];
+    var imuRoll = eulerAngles[1];
+    if (flying) {
+        if (imuPitch < 10 && imuRoll < 10) quad.hover();
+        else {
+            quad.driveStepsRemaining = 1;
+            quad.speeds = {
+                yaw: 0,
+                pitch: -imuPitch,
+                roll: -imuRoll,
+                altitude: 0
+            }
         }
     }
+    console.log(eulerAngles);
 }
 
 function onSerialError(err) {
